@@ -9,12 +9,16 @@ RUN git clone https://github.com/cohenerickson/Velocity.git
 
 WORKDIR /Velocity
 
-RUN npm install \
+RUN npm install && \
     npm run build
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD curl -f http://localhost:3000/health || exit 1
+# Ensure the server binds to 0.0.0.0
+RUN sed -i 's/localhost/0.0.0.0/' scripts/server.js
 
 ENTRYPOINT npm start
 
+# Expose the ports the application listens on
 EXPOSE 3000
 EXPOSE 8080
+
+# HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD curl -f http://localhost:3000/health || exit 1
